@@ -1,36 +1,34 @@
-# importation des modules
 import yfinance as yf
+import pandas as pd
 
-# Récupération des données boursières
 def get_stock_data(ticker, start_date, end_date):
     """
-    Récupère les données boursières pour un ticker donné entre deux dates.
-    
-    :param ticker: Le symbole boursier de l'instrument financier
-    :param start_date: La date de début au format 'YYYY-MM-DD'
-    :param end_date: La date de fin au format 'YYYY-MM-DD'
-    :return: Un DataFrame contenant les données boursières
-    """
-    stock_data = yf.download(ticker, start=start_date, end=end_date)
-    return stock_data
+    Fetch historical stock data for a given ticker and date range.
 
-# Fonction pour trier les données
-def sort_stock_data(stock_data, column='Close', ascending=True):
+    :param ticker: Stock symbol (e.g., 'AAPL')
+    :param start_date: Start date in 'YYYY-MM-DD' format
+    :param end_date: End date in 'YYYY-MM-DD' format
+    :return: A pandas DataFrame with historical stock data
     """
-    Trie les données boursières par une colonne spécifique.
-    
-    :param stock_data: Un DataFrame contenant les données boursières
-    :param column: La colonne par laquelle trier (par défaut 'Close')
-    :param ascending: Ordre de tri (par défaut True pour croissant)
-    :return: Un DataFrame trié
+    data = yf.download(ticker, start=start_date, end=end_date)
+    return data
+
+def sort_stock_data(data, column='Close', ascending=True):
     """
-    return stock_data.sort_values(by=column, ascending=ascending)
-    
-# Fonction pour afficher les données
-def display_stock_data(stock_data):
+    Sort stock data based on a specific column.
+
+    :param data: DataFrame containing stock data
+    :param column: Column to sort by (default is 'Close')
+    :param ascending: Sort order (default is True for ascending)
+    :return: A sorted DataFrame
     """
-    Affiche les données boursières.
-    
-    :param stock_data: Un DataFrame contenant les données boursières
+    return data.sort_values(by=column, ascending=ascending)
+
+def display_stock_data(data, rows=10):
     """
-    print(stock_data)
+    Display the first few rows of the stock data.
+
+    :param data: DataFrame containing stock data
+    :param rows: Number of rows to display (default is 10)
+    """
+    print(data.head(rows))
