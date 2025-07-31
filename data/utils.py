@@ -11,6 +11,8 @@ def get_stock_data(ticker, start_date, end_date):
     :return: A pandas DataFrame with historical stock data
     """
     data = yf.download(ticker, start=start_date, end=end_date)
+    if isinstance(data.columns, pd.MultiIndex):
+        data.columns = data.columns.droplevel(1)
     return data
 
 def sort_stock_data(data, column='Close', ascending=True):
@@ -22,6 +24,7 @@ def sort_stock_data(data, column='Close', ascending=True):
     :param ascending: Sort order (default is True for ascending)
     :return: A sorted DataFrame
     """
+    
     return data.sort_values(by=column, ascending=ascending)
 
 def display_stock_data(data, rows=10):
@@ -32,3 +35,9 @@ def display_stock_data(data, rows=10):
     :param rows: Number of rows to display (default is 10)
     """
     print(data.head(rows))
+
+def show_performance(df):
+    cum_strategy = (1 + df['Strategy_Return']).prod() - 1
+    cum_market = (1 + df['Return']).prod() - 1
+    print(f"Buy and Hold Return: {cum_market*100:.2f}%")
+    print(f"SMA strategy Return: {cum_strategy*100:.2f}%")
