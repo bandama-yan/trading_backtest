@@ -1,4 +1,3 @@
-import os
 from data.utils import*
 from models.sma_strategy import apply_sma_strategy
 
@@ -32,9 +31,7 @@ def main ():
     display_stock_data(result[['Close', 'SMA_short', 'SMA_long', 'Signal', 'Strategy_Return']])
 
     # Save results to CSV
-    if not os.path.exists("results"):
-        os.makedirs("results")
-    result.to_csv("results/sma_results.csv")
+    save_to_csv(result[[ 'Signal','Return', 'Strategy_Return']],"results/sma_strategy_results.csv")
 
 if __name__ == "__main__":
     main()

@@ -1,5 +1,6 @@
 import yfinance as yf
 import pandas as pd
+import os
 
 def get_stock_data(ticker, start_date, end_date):
     """
@@ -41,3 +42,13 @@ def show_performance(df):
     cum_market = (1 + df['Return']).prod() - 1
     print(f"Buy and Hold Return: {cum_market*100:.2f}%")
     print(f"SMA strategy Return: {cum_strategy*100:.2f}%")
+
+def save_to_csv(df, filename):
+    """
+    Save DataFrame to a CSV file.
+    :param df: DataFrame to save
+    :param filename: Name of the CSV file
+    """
+    if not os.path.exists("results"):
+        os.makedirs("results")
+    df.to_csv(filename) 
