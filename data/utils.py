@@ -52,3 +52,18 @@ def save_to_csv(df, filename):
     if not os.path.exists("results"):
         os.makedirs("results")
     df.to_csv(filename) 
+
+def prepare_data(df):
+    """
+    Prepare features and target for classification.
+    Target = 1 if tomorrow's close price > today's close price, else 0.
+    """
+    df = df.copy()
+    df['Target'] = (df['Close'].shift(-1) > df['Close']).astype(int)
+    df = df[:-1]  # remove last row (NaN)
+    
+    features = ['Close', 'SMA_short', 'SMA_long']
+    X = df[features]
+    y = df['Target']
+    return X, y
+
