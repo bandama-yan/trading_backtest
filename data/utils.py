@@ -67,3 +67,56 @@ def prepare_data(df):
     y = df['Target']
     return X, y
 
+def add_features(df):
+    """
+    Add technical indicators to the stock data.
+    """
+    df = df.copy()
+    df['SMA_short'] = df['Close'].rolling(window=10).mean()
+    df['SMA_long'] = df['Close'].rolling(window=50).mean()
+    return df
+
+
+def add_trading_signals(df, model):
+    """
+    Add trading signals based on model predictions.
+    Signal = 1 → Buy (go long)
+    Signal = -1 → Sell (go short)
+    """
+    # Prepare features and target
+    X, y = prepare_data(df)
+    
+    # Align dataframe with the number of rows in X
+    df_trading = df.iloc[-len(X):].copy()
+    
+    # Predict market direction with the trained model
+    df_trading['Prediction'] = model.predict(X)
+    
+    # Map predictions to trading signals:
+    # 1 means the model expects an upward move (go long),
+    # 0 means the model expects a downward move → we treat it as -1 (go short).
+    df_trading['Signal'] = df_trading['Prediction'].replace({0: -1, 1: 1})
+    
+    return df_trading
+
+
+def compute_strategy_returns(df_trading):
+    """
+    Compute strategy returns using the trading signals.
+    - If Signal = 1 → profit from positive returns (long).
+    - If Signal = -1 → profit from negative returns (short).
+    """
+    # Daily percentage change of closing price
+    df_trading['Return'] = df_trading['Close'].pct_change()
+    
+    # Strategy return:
+    # Signal of the previous day * today's market return
+    # → if long yesterday and price goes up, you profit.
+    # → if short yesterday and price goes down, you profit.
+    df_trading['Strategy_Return'] = df_trading['Signal'].shift(1) * df_trading['Return']
+    
+    # Cumulative returns over time
+    df_trading['Cumulative_Strategy_Return'] = (1 + df_trading['Strategy_Return']).cumprod()
+    df_trading['Cumulative_Market_Return'] = (1 + df_trading['Return']).cumprod()
+    
+    return df_trading
